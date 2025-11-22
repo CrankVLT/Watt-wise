@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="WattWise">
     <meta name="theme-color" content="#0f172a">
-    <meta name="description" content="Calculadora de consumo eléctrico para tacaños.">
+    <meta name="description" content="Calculadora de consumo eléctrico para dispositivos">
     
     <!-- Libraries (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -81,7 +81,7 @@
             <header className="flex justify-between items-center p-6 mb-4">
                 <div>
                     <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">WattWise</h1>
-                    <p className="text-xs text-slate-400 font-mono tracking-wider">INGENIERÍA DOMÉSTICA EN TACAÑERIA</p>
+                    <p className="text-xs text-slate-400 font-mono tracking-wider">CALCULADORA DE COSTO ENERGÉTICO</p>
                 </div>
                 <button onClick={() => { playSound('click'); setActiveTab('tariff'); }} className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 px-3 py-1.5 rounded-full transition-colors text-xs font-semibold text-cyan-400">
                     <Icon name="zap" size={14} /> ${tariff}/kWh
@@ -337,6 +337,7 @@
     </script>
 </body>
 </html>
+
 
 
 
