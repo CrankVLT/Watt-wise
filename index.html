@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>WattWise | Calculadora de tacañeria</title>
     
-    <!-- PWA Meta Tags -->
+    <!-- PWA Meta Tags para iOS -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="WattWise">
     <meta name="theme-color" content="#0f172a">
     <meta name="description" content="Calculadora de consumo eléctrico para tacaños.">
     
@@ -147,7 +148,6 @@
                 { name: 'Hervidor', watts: 2000, icon: 'coffee' },
                 { name: 'TV 55"', watts: 110, icon: 'tv' },
                 { name: 'Refrigerador', watts: 150, icon: 'snowflake' },
-                // --- NUEVOS PRESETS ---
                 { name: 'Microondas', watts: 1200, icon: 'microwave' },
                 { name: 'Lavadora', watts: 500, icon: 'waves' },
                 { name: 'Estufa Elec.', watts: 1500, icon: 'flame' },
@@ -186,16 +186,11 @@
             <div className="max-w-2xl mx-auto pb-24 animate-enter">
                 <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2"><Icon name="zap" className="text-yellow-400" /> Configuración de Tarifa</h2>
                 
-                {/* CAMBIO 1: 'p-4 md:p-6' reduce el relleno en móvil para dar más espacio al contenido */}
+                {/* FIX: Clases responsivas aplicadas para móvil */}
                 <div className="glass-panel rounded-3xl p-4 md:p-6 mb-6">
                     <label className="text-sm text-slate-400 block mb-3">Costo por kWh (CLP)</label>
-                    
-                    {/* CAMBIO 2: 'gap-2 md:gap-4' reduce la separación entre input y botón en móvil */}
                     <div className="flex gap-2 md:gap-4 items-center">
-                        {/* CAMBIO 3: 'p-3' y 'text-xl' hacen el input un poco más compacto en móvil */}
                         <input type="number" value={tariff} onChange={(e) => setTariff(Number(e.target.value))} className="flex-1 bg-slate-800 border border-slate-600 text-white rounded-xl p-3 md:p-4 text-xl md:text-2xl font-mono focus:outline-none focus:border-cyan-500" />
-                        
-                        {/* CAMBIO 4: 'px-3' reduce el ancho del botón en móvil */}
                         <button onClick={() => {setTariff(230); playSound('success');}} className="bg-cyan-900/30 text-cyan-400 px-3 md:px-4 py-3 md:py-4 rounded-xl font-bold text-xs md:text-sm hover:bg-cyan-900/50 border border-cyan-800">RESET</button>
                     </div>
                     <p className="text-xs text-slate-500 mt-3">* Calculado basado en tu boleta reciente (Costos Variables / Consumo).</p>
@@ -236,7 +231,58 @@
             const [kwhLabel, setKwhLabel] = useState(17.67);
             const [calcMode, setCalcMode] = useState('watts');
             const [activeTab, setActiveTab] = useState('calculator');
-            const [showInstall, setShowInstall] = useState(true);
+            const [deferredPrompt, setDeferredPrompt] = useState(null);
+            const [isInstallable, setIsInstallable] = useState(false);
+
+            // --- LOGICA PWA INTELIGENTE (INYECCIÓN) ---
+            useEffect(() => {
+                // 1. Generar Manifesto Dinámico
+                const iconSVG = encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none"><rect width="512" height="512" rx="128" fill="#0f172a"/><path d="M256 112L160 288H288L256 400L352 224H224L256 112Z" fill="#22d3ee" stroke="#fff" stroke-width="20"/></svg>`);
+                const manifest = {
+                    name: "WattWise",
+                    short_name: "WattWise",
+                    description: "Calculadora de consumo eléctrico para tacaños",
+                    start_url: ".",
+                    display: "standalone",
+                    background_color: "#0f172a",
+                    theme_color: "#0f172a",
+                    orientation: "portrait",
+                    icons: [{ src: `data:image/svg+xml;charset=utf-8,${iconSVG}`, sizes: "512x512", type: "image/svg+xml" }]
+                };
+                
+                const stringManifest = JSON.stringify(manifest);
+                const blob = new Blob([stringManifest], {type: 'application/json'});
+                const manifestURL = URL.createObjectURL(blob);
+                
+                let link = document.querySelector('#dynamic-manifest');
+                if (!link) {
+                    link = document.createElement('link');
+                    link.id = 'dynamic-manifest';
+                    link.rel = 'manifest';
+                    document.head.appendChild(link);
+                }
+                link.href = manifestURL;
+
+                // 2. Escuchar evento de instalación (Android)
+                const handleInstallPrompt = (e) => {
+                    e.preventDefault();
+                    setDeferredPrompt(e);
+                    setIsInstallable(true);
+                };
+
+                window.addEventListener('beforeinstallprompt', handleInstallPrompt);
+                return () => window.removeEventListener('beforeinstallprompt', handleInstallPrompt);
+            }, []);
+
+            const handleInstallClick = async () => {
+                if (!deferredPrompt) return;
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    setIsInstallable(false);
+                }
+                setDeferredPrompt(null);
+            };
 
             let dailyKwh = 0;
             let activeWatts = 0;
@@ -269,12 +315,18 @@
                         {activeTab === 'tariff' && <TariffView tariff={tariff} setTariff={setTariff} />}
                         {activeTab === 'help' && <HelpView />}
                     </main>
-                    {showInstall && (
+                    
+                    {/* Botón de Instalación Inteligente */}
+                    {isInstallable && (
                         <div className="fixed bottom-20 left-4 right-4 bg-cyan-900 text-white p-4 rounded-xl shadow-2xl border border-cyan-500/30 flex justify-between items-center animate-enter z-40 md:hidden">
-                            <div className="text-xs"><p className="font-bold">Instalar App</p><p className="text-cyan-200">Añadir a inicio para pantalla completa.</p></div>
-                            <button onClick={() => setShowInstall(false)} className="text-cyan-200 hover:text-white"><Icon name="x" size={16}/></button>
+                            <div className="text-xs"><p className="font-bold">Instalar App</p><p className="text-cyan-200">Úsala sin internet y a pantalla completa.</p></div>
+                            <div className="flex gap-3">
+                                <button onClick={() => setIsInstallable(false)} className="text-cyan-400 hover:text-white text-xs font-bold">AHORA NO</button>
+                                <button onClick={handleInstallClick} className="bg-cyan-500 text-white px-3 py-1 rounded-lg text-xs font-bold shadow-lg">INSTALAR</button>
+                            </div>
                         </div>
                     )}
+                    
                     <Navigation activeTab={activeTab} setActiveTab={setActiveTab} />
                 </div>
             );
