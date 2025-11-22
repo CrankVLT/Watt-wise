@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WattWise | Calculadora de Energía</title>
+    <title>WattWise | Calculadora de tacañeria</title>
     
     <!-- PWA Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
-    <meta name="description" content="Calculadora de consumo eléctrico basada en primeros principios.">
+    <meta name="description" content="Calculadora de consumo eléctrico para tacaños.">
     
     <!-- Libraries (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -142,11 +142,20 @@
             const devices = [
                 { name: 'PS5 (Juego)', watts: 200, icon: 'gamepad-2' },
                 { name: 'PS5 (Reposo)', watts: 5, icon: 'moon' },
+                { name: 'PS4 Pro', watts: 160, icon: 'gamepad-2' },
                 { name: 'Notebook', watts: 45, icon: 'laptop' },
                 { name: 'Hervidor', watts: 2000, icon: 'coffee' },
                 { name: 'TV 55"', watts: 110, icon: 'tv' },
-                { name: 'Refrigerador', watts: 150, icon: 'snowflake' }
+                { name: 'Refrigerador', watts: 150, icon: 'snowflake' },
+                // --- NUEVOS PRESETS ---
+                { name: 'Microondas', watts: 1200, icon: 'microwave' },
+                { name: 'Lavadora', watts: 500, icon: 'waves' },
+                { name: 'Estufa Elec.', watts: 1500, icon: 'flame' },
+                { name: 'Ventilador', watts: 60, icon: 'fan' },
+                { name: 'Ampolleta LED', watts: 9, icon: 'lightbulb' },
+                { name: 'Router WiFi', watts: 10, icon: 'wifi' }
             ];
+            
             return (
                 <div className="col-span-12 animate-enter" style={{animationDelay: '0.2s'}}>
                     <h3 className="text-sm font-bold text-slate-500 mb-3 ml-1">PRESETS RÁPIDOS</h3>
@@ -166,7 +175,7 @@
         const Navigation = ({ activeTab, setActiveTab }) => (
             <nav className="fixed bottom-0 left-0 w-full bg-slate-900/90 backdrop-blur-lg border-t border-white/10 p-2 z-50 safe-area-pb">
                 <div className="flex justify-around max-w-md mx-auto">
-                    <button onClick={() => {playSound('click'); setActiveTab('calculator')}} className={`flex flex-col items-center p-2 rounded-lg w-16 transition-colors ${activeTab === 'calculator' ? 'text-cyan-400' : 'text-slate-500'}`}><Icon name="calculator" size={20} /><span className="text-[10px] mt-1 font-medium">Calc</span></button>
+                    <button onClick={() => {playSound('click'); setActiveTab('calculator')}} className={`flex flex-col items-center p-2 rounded-lg w-16 transition-colors ${activeTab === 'calculator' ? 'text-cyan-400' : 'text-slate-500'}`}><Icon name="calculator" size={20} /><span className="text-[10px] mt-1 font-medium">Calculadora</span></button>
                     <button onClick={() => {playSound('click'); setActiveTab('tariff')}} className={`flex flex-col items-center p-2 rounded-lg w-16 transition-colors ${activeTab === 'tariff' ? 'text-cyan-400' : 'text-slate-500'}`}><Icon name="settings-2" size={20} /><span className="text-[10px] mt-1 font-medium">Tarifa</span></button>
                     <button onClick={() => {playSound('click'); setActiveTab('help')}} className={`flex flex-col items-center p-2 rounded-lg w-16 transition-colors ${activeTab === 'help' ? 'text-cyan-400' : 'text-slate-500'}`}><Icon name="book-open" size={20} /><span className="text-[10px] mt-1 font-medium">Ayuda</span></button>
                 </div>
@@ -196,7 +205,7 @@
             <div className="max-w-2xl mx-auto pb-24 animate-enter space-y-6">
                 <div className="glass-panel rounded-3xl p-6 border-l-4 border-cyan-500">
                     <h2 className="text-lg font-bold text-white mb-2 flex items-center gap-2">Primeros Principios</h2>
-                    <p className="text-sm text-slate-300 leading-relaxed">No te fíes del total de la boleta. Para estimar ahorro o gasto, solo importa el <strong className="text-cyan-400">Costo Variable Unitario</strong>.</p>
+                    <p className="text-sm text-slate-300 leading-relaxed">Gordito, no te confíes del total de la boleta. Para estimar ahorro o gasto, solo importa el <strong className="text-cyan-400">Costo Variable Unitario</strong>.</p>
                 </div>
                 <div className="glass-panel rounded-3xl p-6">
                     <h3 className="text-md font-bold text-white mb-4 flex items-center gap-2"><Icon name="search" size={18} /> ¿Dónde encontrar los datos?</h3>
